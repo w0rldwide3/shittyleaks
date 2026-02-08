@@ -3389,6 +3389,20 @@ local themes = {
                 Library:Themify(Items.Accent, "inline", "BackgroundColor3")
                 Items.Accent.BackgroundColor3 = themes.preset.inline 
 
+                -- Visible state fill that we control directly (prevents theming overrides)
+                Items.StateFill = Instance.new("Frame")
+                Items.StateFill.Name = "\0"
+                Items.StateFill.Parent = Items.Outline
+                Items.StateFill.Position = Items.Accent.Position
+                Items.StateFill.Size = Items.Accent.Size
+                Items.StateFill.BorderSizePixel = 0
+                Items.StateFill.BackgroundTransparency = 0
+                Items.StateFill.BackgroundColor3 = Cfg.Enabled and themes.preset.accent or themes.preset.background
+                Items.StateFill.ZIndex = 10
+                local _corner = Instance.new("UICorner")
+                _corner.CornerRadius = UDim.new(0, 6)
+                _corner.Parent = Items.StateFill
+
                 Library:Create( "UIGradient" , {
                     Rotation = 90;
                     Parent = Items.Accent;
