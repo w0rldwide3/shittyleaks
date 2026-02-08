@@ -1483,52 +1483,6 @@ local themes = {
                         BorderSizePixel = 0;
                         BackgroundColor3 = rgb(255, 255, 255)
                     });
-
-                    -- Mobile support: show a draggable "Open" button for touch devices
-                    if InputService.TouchEnabled then
-                        local OpenButton = Instance.new("TextButton")
-                        OpenButton.Name = "MobileOpenButton"
-                        OpenButton.Size = UDim2.fromOffset(90, 38)
-                        OpenButton.Position = UDim2.new(0, 12, 0.85, -38)
-                        OpenButton.AnchorPoint = Vector2.new(0, 0)
-                        OpenButton.Parent = Library.Items
-                        OpenButton.BackgroundColor3 = themes.preset.accent
-                        OpenButton.TextColor3 = Color3.new(1,1,1)
-                        OpenButton.Font = Enum.Font.SourceSansBold
-                        OpenButton.TextSize = 18
-                        OpenButton.Text = "Open"
-                        addCorner(OpenButton, 8)
-
-                        -- Draggable behavior
-                        local dragging = false
-                        local dragInput, dragStart, startPos
-
-                        OpenButton.InputBegan:Connect(function(input)
-                            if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-                                dragging = true
-                                dragStart = input.Position
-                                startPos = OpenButton.Position
-
-                                input.Changed:Connect(function()
-                                    if input.UserInputState == Enum.UserInputState.End then
-                                        dragging = false
-                                    end
-                                end)
-                            end
-                        end)
-
-                        InputService.InputChanged:Connect(function(input)
-                            if dragging and (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement) then
-                                local delta = input.Position - dragStart
-                                OpenButton.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-                            end
-                        end)
-
-                        -- Toggle window visibility
-                        OpenButton.MouseButton1Click:Connect(function()
-                            Items.Window.Visible = not Items.Window.Visible
-                        end)
-                    end
                     
                     Items.Accent = Library:Create( "Frame" , {
                         Name = "\0";
@@ -2045,7 +1999,28 @@ local themes = {
                 Items.Keybind_List.Visible = bool
                 print(bool)
             end
-            
+
+            -- Mobile: show a draggable 'Open' button when touch is enabled
+            if InputService.TouchEnabled then
+                local MobileOpen = Library:Create("TextButton", {
+                    Parent = Library.Items,
+                    Name = "MobileOpen",
+                    Size = dim2(0, 100, 0, 40),
+                    Position = dim2(0, 10, 0.5, -20),
+                    BackgroundColor3 = themes.preset.accent,
+                    BorderSizePixel = 0,
+                    Text = "Open",
+                    FontFace = Library.Font,
+                    TextColor3 = rgb(255, 255, 255)
+                })
+
+                Library:Draggify(MobileOpen)
+
+                MobileOpen.MouseButton1Click:Connect(function()
+                    Cfg.ToggleMenu(not (Items.Window and Items.Window.Visible))
+                end)
+            end
+
             return setmetatable(Cfg, Library)
         end 
 
@@ -3387,21 +3362,7 @@ local themes = {
                     BackgroundColor3 = themes.preset.accent
                 }); Library:Themify(Items.Accent, "accent", "BackgroundColor3")
                 Library:Themify(Items.Accent, "inline", "BackgroundColor3")
-                Items.Accent.BackgroundColor3 = themes.preset.inline 
-
-                -- Visible state fill that we control directly (prevents theming overrides)
-                Items.StateFill = Instance.new("Frame")
-                Items.StateFill.Name = "\0"
-                Items.StateFill.Parent = Items.Outline
-                Items.StateFill.Position = Items.Accent.Position
-                Items.StateFill.Size = Items.Accent.Size
-                Items.StateFill.BorderSizePixel = 0
-                Items.StateFill.BackgroundTransparency = 0
-                Items.StateFill.BackgroundColor3 = Cfg.Enabled and themes.preset.accent or themes.preset.background
-                Items.StateFill.ZIndex = 10
-                local _corner = Instance.new("UICorner")
-                _corner.CornerRadius = UDim.new(0, 6)
-                _corner.Parent = Items.StateFill
+                Items.Accent.BackgroundColor3 = (Cfg.Enabled and themes.preset.accent) or themes.preset.background
 
                 Library:Create( "UIGradient" , {
                     Rotation = 90;
@@ -3543,19 +3504,7 @@ local themes = {
             function Cfg.Set(bool)
                 Cfg.Callback(bool)
 
-                -- Use background color when disabled, accent when enabled
                 Library:Tween(Items.Accent, {BackgroundColor3 = bool and themes.preset.accent or themes.preset.background})
-                -- Update any UIGradient child so the visible accent matches the toggle state
-                do
-                    local grad = Items.Accent:FindFirstChildOfClass("UIGradient")
-                    if grad then
-                        if bool then
-                            grad.Color = rgbseq{ rgbkey(0, themes.preset.accent), rgbkey(1, themes.preset.gradient) }
-                        else
-                            grad.Color = rgbseq{ rgbkey(0, themes.preset.background), rgbkey(1, themes.preset.inline) }
-                        end
-                    end
-                end
                 
                 Flags[Cfg.Flag] = bool
                 
