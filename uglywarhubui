@@ -3504,7 +3504,10 @@ local themes = {
             function Cfg.Set(bool)
                 Cfg.Callback(bool)
 
-                Library:Tween(Items.Accent, {BackgroundColor3 = bool and themes.preset.accent or themes.preset.background})
+                local targetColor = bool and themes.preset.accent or themes.preset.background
+                Library:Tween(Items.Accent, {BackgroundColor3 = targetColor})
+                -- Force immediate assignment to avoid theme/registration overrides
+                Items.Accent.BackgroundColor3 = targetColor
                 
                 Flags[Cfg.Flag] = bool
                 
