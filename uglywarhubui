@@ -3529,7 +3529,8 @@ local themes = {
             function Cfg.Set(bool)
                 Cfg.Callback(bool)
 
-                Library:Tween(Items.Accent, {BackgroundColor3 = bool and themes.preset.accent or themes.preset.inline})
+                -- Use background color when disabled, accent when enabled
+                Library:Tween(Items.Accent, {BackgroundColor3 = bool and themes.preset.accent or themes.preset.background})
                 -- Update any UIGradient child so the visible accent matches the toggle state
                 do
                     local grad = Items.Accent:FindFirstChildOfClass("UIGradient")
@@ -3537,7 +3538,7 @@ local themes = {
                         if bool then
                             grad.Color = rgbseq{ rgbkey(0, themes.preset.accent), rgbkey(1, themes.preset.gradient) }
                         else
-                            grad.Color = rgbseq{ rgbkey(0, themes.preset.inline), rgbkey(1, themes.preset.gradient) }
+                            grad.Color = rgbseq{ rgbkey(0, themes.preset.background), rgbkey(1, themes.preset.inline) }
                         end
                     end
                 end
