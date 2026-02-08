@@ -1373,9 +1373,10 @@ local themes = {
     
     -- Library element functions
         function Library:Window(properties)
+            local defaultSize = InputService.TouchEnabled and dim2(0, 360, 0, 520) or dim2(0, 455, 0, 605)
             local Cfg = {
                 Name = properties.Name or "WarShop On Top | .gg/warshop";
-                Size = properties.Size or dim2(0, 455, 0, 605);
+                Size = properties.Size or defaultSize;
                 TabInfo;
                 Items = {};
             }
